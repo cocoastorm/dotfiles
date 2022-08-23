@@ -15,6 +15,13 @@ require('packer').startup({function()
   use 'nvim-lua/plenary.nvim'
   use 'nvim-lua/popup.nvim'
 
+  use {
+    'ahmedkhalf/project.nvim',
+    config = function()
+      require('project_nvim').setup{}
+    end
+  }
+
   -- editorconfig
   use 'gpanders/editorconfig.nvim'
 
@@ -31,7 +38,7 @@ require('packer').startup({function()
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
 
-  -- linting
+  -- linting for non-lsp servers
   use 'jose-elias-alvarez/null-ls.nvim'
 
   -- content
@@ -39,6 +46,16 @@ require('packer').startup({function()
   use 'junegunn/vim-easy-align'
   use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
   use 'lukas-reineke/indent-blankline.nvim' -- add indentation guides even on blank lines 
+
+  use 'folke/lsp-colors.nvim'
+
+  use {
+    'folke/trouble.nvim',
+    requires = 'kyazdani42/nvim-web-devicons',
+    config = function()
+      require('trouble').setup{}
+    end
+  }
 
   -- statusline
   use 'nvim-lualine/lualine.nvim' -- fancier statusline
@@ -216,9 +233,6 @@ vim.api.nvim_set_keymap('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<
 local on_attach = function(_, bufnr)
   -- Enable completion triggered by <c-x><c-o>
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  -- Mappings.
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
@@ -426,6 +440,11 @@ null_ls.setup({
 require'nvim-web-devicons'.setup()
 require'nvim-tree'.setup({
   sync_root_with_cwd = true,
+  respect_buf_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_root = true,
+  },
 })
 
 -- statusbar
@@ -464,16 +483,29 @@ require('gitsigns').setup {
 }
 
 -- Telescope
-require('telescope').setup {
+
+local actions = require('telescope.actions')
+local trouble = require('trouble.providers.telescope')
+
+local telescope = require('telescope')
+
+telescope.setup {
   defaults = {
     mappings = {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ['<C-t>'] = trouble.open_with_trouble,
+      },
+      n = {
+        ['<C-t>'] = trouble.open_with_trouble,
       },
     },
   },
 }
+
+-- load project.nvim extension for telescope
+telescope.load_extension('projects')
 
 -- add leader shortcuts with telescope
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers)
@@ -498,4 +530,13 @@ vim.api.nvim_set_keymap('x', ';;', '<esc>', opts)
 vim.api.nvim_set_keymap('n', '<C-n>', ':NvimTreeToggle<cr>', opts)
 vim.api.nvim_set_keymap('n', '<leader>r', ':NvimTreeRefresh', opts)
 vim.api.nvim_set_keymap('n', '<leader>n', ':NvimTreeFindFile', opts)
+
+-- trouble.nvim
+vim.api.nvim_set_keymap('n', '<leader>xx', '<cmd>Trouble<cr>', opts)
+vim.api.nvim_set_keymap('n', '<leader>xw', '<cmd>Trouble workspace_diagnostics<cr>', opts)
+vim.api.nvim_set_keymap('n', '<leader>xd', '<cmd>Trouble document_diagnostics<cr>', opts)
+vim.api.nvim_set_keymap('n', '<leader>xl', '<cmd>Trouble loclist<cr>', opts)
+vim.api.nvim_set_keymap('n', '<leader>xq', '<cmd>Trouble quickfix<cr>', opts)
+vim.api.nvim_set_keymap('n', 'gR', '<cmd>Trouble lsp_references<cr>', opts)
+
 
