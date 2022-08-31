@@ -129,7 +129,6 @@ vim.opt.laststatus = 3
 -- white characters
 vim.opt.autoindent = true
 vim.opt.smartindent = true
-vim.opt.breakindent = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
@@ -272,9 +271,9 @@ nvim_lsp.jsonls.setup {
     json = {
       schemas = require('schemastore').json.schemas {
         ignore = {
-	  '.eslintrc',
-	  'package.json',
-	},
+          '.eslintrc',
+          'package.json',
+        },
       },
       validate = { enable = true },
     }
@@ -352,6 +351,18 @@ vim.api.nvim_create_autocmd('BufWritePre', {
     end
   end,
 })
+
+-- nvim lsp: disable virtual text
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    underline = true,
+    virtual_text = function(namespace, bufnr)
+      return vim.b[bufnr].show_virtual_text == true
+    end,
+    signs = true,
+    update_in_insert = false
+  }
+)
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = '*.go',
