@@ -15,12 +15,7 @@ require('packer').startup({function()
   use 'nvim-lua/plenary.nvim'
   use 'nvim-lua/popup.nvim'
 
-  use {
-    'ahmedkhalf/project.nvim',
-    config = function()
-      require('project_nvim').setup{}
-    end
-  }
+  use 'ahmedkhalf/project.nvim'
 
   -- editorconfig
   use 'gpanders/editorconfig.nvim'
@@ -52,9 +47,6 @@ require('packer').startup({function()
   use {
     'folke/trouble.nvim',
     requires = 'kyazdani42/nvim-web-devicons',
-    config = function()
-      require('trouble').setup{}
-    end
   }
 
   -- statusline
@@ -82,7 +74,7 @@ require('packer').startup({function()
     requires = {{'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'}}
   }
 
-  use {'Mofiqul/dracula.nvim', as = 'dracula'}
+  use 'folke/tokyonight.nvim'
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
@@ -101,12 +93,12 @@ config = {
 -- colors and font
 vim.opt.termguicolors = true
 vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h11'
-vim.api.nvim_command('colorscheme dracula')
+vim.api.nvim_command('colorscheme tokyonight')
 
 -- use filetype.lua
 -- see https://github.com/neovim/neovim/pull/16600
-vim.g.do_filetype_lua = 1
-vim.g.do_did_load_filetypes = 0
+-- vim.g.do_filetype_lua = 1
+-- vim.g.do_did_load_filetypes = 0
 
 -- remap space as leader key
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -129,6 +121,7 @@ vim.opt.laststatus = 3
 -- white characters
 vim.opt.autoindent = true
 vim.opt.smartindent = true
+vim.opt.breakindent = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
@@ -370,16 +363,19 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- lint
-local null_ls = require('null-ls')
-null_ls.setup({
-  root_dir = require('null-ls.utils').root_pattern("composer.json", ".git"),
-  diagnostics_format = "#{m} (#{c}) [#{s}]",
-  sources = {
-    null_ls.builtins.completion.spell,
-    null_ls.builtins.diagnostics.phpcs.with({ prefer_local = 'vendor/bin' }),
-    -- null_ls.builtins.formatting.phpcbf.with({ prefer_local = 'vendor/bin' }),
-  },
-})
+-- local null_ls = require('null-ls')
+-- null_ls.setup({
+--   root_dir = require('null-ls.utils').root_pattern("composer.json", ".git"),
+--   diagnostics_format = "#{m} (#{c}) [#{s}]",
+--   sources = {
+--     null_ls.builtins.completion.spell,
+--     null_ls.builtins.diagnostics.phpcs.with({ prefer_local = 'vendor/bin' }),
+--     -- null_ls.builtins.formatting.phpcbf.with({ prefer_local = 'vendor/bin' }),
+--   },
+-- })
+
+-- trouble.nvim
+require'trouble'.setup {}
 
  -- treesitter
  require'nvim-treesitter.configs'.setup {
@@ -462,7 +458,7 @@ require'nvim-tree'.setup({
 require('lualine').setup {
   options = {
     icons_enable = false,
-    theme = 'dracula',
+    theme = 'tokyonight',
     component_separators = '|',
     section_separators = '',
   },
@@ -493,8 +489,10 @@ require('gitsigns').setup {
   },
 }
 
--- Telescope
+-- projects.nvim
+require'project_nvim'.setup {}
 
+-- Telescope
 local actions = require('telescope.actions')
 local trouble = require('trouble.providers.telescope')
 
