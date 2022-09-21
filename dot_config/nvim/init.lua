@@ -93,7 +93,7 @@ config = {
 -- colors and font
 vim.opt.termguicolors = true
 vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h11'
-vim.api.nvim_command('colorscheme tokyonight')
+vim.api.nvim_command('colorscheme tokyonight-moon')
 
 -- use filetype.lua
 -- see https://github.com/neovim/neovim/pull/16600
