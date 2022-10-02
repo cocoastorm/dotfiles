@@ -93,7 +93,6 @@ config = {
 -- colors and font
 vim.opt.termguicolors = true
 vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h11'
-vim.api.nvim_command('colorscheme tokyonight-moon')
 
 -- use filetype.lua
 -- see https://github.com/neovim/neovim/pull/16600
@@ -140,6 +139,24 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
+
+-- tokyo-night
+require'tokyonight'.setup {
+  transparent = true,
+  terminal_colors = true,
+  styles = {
+      comments = { italic = true },
+      keywords = { italic = true },
+      functions = {},
+      variables = {},
+      -- Background styles. Can be "dark", "transparent" or "normal"
+      sidebars = "dark",
+      floats = "dark",
+  },
+  sidebars = { "qf", "help" },
+}
+
+vim.api.nvim_command('colorscheme tokyonight')
 
 -- lsp, completion, and nvim-treesitter
 local servers = {
@@ -407,7 +424,10 @@ require'trouble'.setup {}
       node_decremental = 'grm',
     },
    },
-   indent = { enable = true },
+   indent = {
+    enable = true,
+    disable = { 'yaml' }
+   },
    textobjects = {
     select = {
       enable = true,
@@ -548,4 +568,8 @@ vim.api.nvim_set_keymap('n', '<leader>xl', '<cmd>Trouble loclist<cr>', opts)
 vim.api.nvim_set_keymap('n', '<leader>xq', '<cmd>Trouble quickfix<cr>', opts)
 vim.api.nvim_set_keymap('n', 'gR', '<cmd>Trouble lsp_references<cr>', opts)
 
+-- easy align
+local easy_align_opts = { noremap = false, silent = true }
+vim.api.nvim_set_keymap('n', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
+vim.api.nvim_set_keymap('x', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
 
