@@ -21,10 +21,10 @@ require('packer').startup({function()
   use 'gpanders/editorconfig.nvim'
 
   -- lsp config
-  use {
-    'neovim/nvim-lspconfig',
-    requires = {{'williamboman/nvim-lsp-installer'}, {'b0o/schemastore.nvim'}}
-  }
+  use 'b0o/schemastore.nvim'
+  use 'williamboman/mason.nvim'
+  use 'williamboman/mason-lspconfig.nvim'
+  use 'neovim/nvim-lspconfig'
 
   -- autocompletion
   use 'hrsh7th/cmp-nvim-lsp'
@@ -167,12 +167,22 @@ local servers = {
   "sumneko_lua",
   "taplo",
   "yamlls",
-  "vuels",
 }
 
-require'nvim-lsp-installer'.setup {
+-- mason.nvim
+require('mason').setup({
+  ui = {
+    icons = {
+      package_installed = "✓",
+      package_pending = "➜",
+      package_uninstalled = "✗"
+    }
+  }
+})
+
+require('mason-lspconfig').setup({
   automatic_installation = true
-}
+})
 
 -- autocompletion
 local cmp = require'cmp'
