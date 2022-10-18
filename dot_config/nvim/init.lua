@@ -275,6 +275,7 @@ end
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local nvim_lsp = require('lspconfig')
+local nvim_lsp_util = require('lspconfig.util')
 
 for _, lsp in pairs(servers) do
   nvim_lsp[lsp].setup {
@@ -300,15 +301,34 @@ nvim_lsp.jsonls.setup {
   }
 }
 
--- deno
-nvim_lsp.denols.setup {
+-- typescript
+local function get_typescript_server_path(root_dir)
+  local global_ts = '/opt/homebrew/lib/node_modules/typescript/lib/tsserverlibrary.js'
+  local found_ts = ''
+  local function check_dir(path)
+    found_ts = nvim_lsp_util.path.join(path, 'node_modules', 'typescript', 'lib', 'tsserverlibrary.js')
+    if nvim_lsp_util.path.exists(found_ts) then
+      return path
+    end
+  end
+  if nvim_lsp_util.search_ancestors(root_dir, check_dir) then
+    return found_ts
+  else
+    return global_ts
+  end
+end
+
+nvim_lsp.volar.setup {
+  on_new_config = function(new_config, new_root_dir)
+    new_config.init_options.typescript.serverPath = get_typescript_server_path(new_root_dir)
+  end,
+
   capabilities = capabilities,
   on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("deno.json"),
-  init_options = { lint = true },
+
+  filetypes = {'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json'}
 }
 
--- typescript
 nvim_lsp.tsserver.setup {
   capabilities = capabilities,
   on_attach = on_attach,
