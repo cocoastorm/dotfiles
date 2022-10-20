@@ -22,9 +22,12 @@ require('packer').startup({function()
 
   -- lsp config
   use 'b0o/schemastore.nvim'
-  use 'williamboman/mason.nvim'
-  use 'williamboman/mason-lspconfig.nvim'
-  use 'neovim/nvim-lspconfig'
+
+  use {
+    'williamboman/mason.nvim',
+    'williamboman/mason-lspconfig.nvim',
+    'neovim/nvim-lspconfig',
+  }
 
   -- autocompletion
   use 'hrsh7th/cmp-nvim-lsp'
@@ -142,7 +145,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- tokyo-night
 require'tokyonight'.setup {
-  transparent = true,
   terminal_colors = true,
   styles = {
       comments = { italic = true },
@@ -180,9 +182,7 @@ require('mason').setup({
   }
 })
 
-require('mason-lspconfig').setup({
-  automatic_installation = true
-})
+require('mason-lspconfig').setup{}
 
 -- autocompletion
 local cmp = require'cmp'
@@ -275,30 +275,87 @@ end
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local nvim_lsp = require('lspconfig')
-local nvim_lsp_util = require('lspconfig.util')
 
-for _, lsp in pairs(servers) do
-  nvim_lsp[lsp].setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-  }
-end
+require'mason-lspconfig'.setup_handlers {
+  -- the first entry (without a key) will be the default handler
+  -- and will be called for each installed server that doesn't have
+  -- a dedicated handler
+  function (server_name) -- default handler
+    nvim_lsp[server_name].setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }
+  end,
 
--- jsonls
-nvim_lsp.jsonls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  settings = {
-    json = {
-      schemas = require('schemastore').json.schemas {
-        ignore = {
-          '.eslintrc',
-          'package.json',
+  -- jsonls
+  ["jsonls"] = function ()
+    nvim_lsp.jsonls.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = {
+        json = {
+          schemas = require('schemastore').json.schemas {
+            ignore = {
+              '.eslintrc',
+              'package.json',
+            },
+          },
+          validate = { enable = true },
+        }
+      }
+    }
+  end,
+
+  -- typescript
+  ["tsserver"] = function ()
+    nvim_lsp.tsserver.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }
+  end,
+
+  ["volar"] = function ()
+    nvim_lsp.volar.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+    }
+  end,
+
+  -- intelephense
+  ["intelephense"] = function ()
+    nvim_lsp.intelephense.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      init_options = { licenceKey = vim.fn.stdpath('config')..'/intelephense-license.txt' },
+    }
+  end,
+
+  -- psalm
+  ["psalm"] = function ()
+    nvim_lsp.psalm.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      root_dir = nvim_lsp.util.root_pattern("composer.json", "psalm.xml")
+    }
+  end,
+
+  -- gopls
+  ["gopls"] = function ()
+    nvim_lsp.gopls.setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      cmd = {"gopls", "serve"},
+      root_dir = nvim_lsp.util.root_pattern("go.mod"),
+      settings = {
+        gopls = {
+          analyses = {
+            unusedparams = true,
+          },
+          staticcheck = true,
         },
       },
-      validate = { enable = true },
     }
-  }
+  end,
 }
 
 -- typescript
@@ -318,55 +375,10 @@ local function get_typescript_server_path(root_dir)
   end
 end
 
-nvim_lsp.volar.setup {
-  on_new_config = function(new_config, new_root_dir)
-    new_config.init_options.typescript.serverPath = get_typescript_server_path(new_root_dir)
-  end,
+local function on_new_config(new_config, new_root_dir)
+  new_config.init_options.typescript.serverPath = get_typescript_server_path(new_root_dir)
+end
 
-  capabilities = capabilities,
-  on_attach = on_attach,
-
-  filetypes = {'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json'}
-}
-
-nvim_lsp.tsserver.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("package.json"),
-  init_options = { lint = true },
-}
-
--- intelephense
-nvim_lsp.intelephense.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("composer.json"),
-  init_options = { licenceKey = vim.fn.stdpath('config')..'/intelephense-license.txt' }
-}
-
--- psalm
-nvim_lsp.psalm.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("psalm.xml"),
-}
-
--- gopls
-nvim_lsp.gopls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  cmd = {"gopls", "serve"},
-  filetypes = {"go", "gomod"},
-  root_dir = nvim_lsp.util.root_pattern("go.mod"),
-  settings = {
-    gopls = {
-      analyses = {
-        unusedparams = true,
-      },
-      staticcheck = true,
-    },
-  },
-}
 
 -- golang: imports
 -- vim.api.nvim_create_autocmd('BufWritePre', {
@@ -427,12 +439,14 @@ require'trouble'.setup {}
  -- treesitter
  require'nvim-treesitter.configs'.setup {
   ensure_installed = {
-    'bash',
+    'html',
     'css',
-    'go',
+    'scss',
     'javascript',
+    'typescript',
     'json',
     'lua',
+    'go',
     'php',
     'rust',
     'toml',
