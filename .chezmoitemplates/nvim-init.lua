@@ -67,12 +67,16 @@ require('packer').startup({function()
 
   use {
     'kyazdani42/nvim-tree.lua',
-    requires = {{'kyazdani42/nvim-web-devicons'}},
+    requires = {
+      {'kyazdani42/nvim-web-devicons'},
+    },
   }
 
   use {
     'nvim-telescope/telescope.nvim',
-    requires = {{'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'}}
+    requires = {
+      {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'}
+    },
   }
 
   use 'folke/tokyonight.nvim'
