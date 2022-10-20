@@ -15,8 +15,6 @@ require('packer').startup({function()
   use 'nvim-lua/plenary.nvim'
   use 'nvim-lua/popup.nvim'
 
-  use 'ahmedkhalf/project.nvim'
-
   -- editorconfig
   use 'gpanders/editorconfig.nvim'
 
@@ -553,9 +551,6 @@ require('gitsigns').setup {
   },
 }
 
--- projects.nvim
-require'project_nvim'.setup {}
-
 -- Telescope
 local actions = require('telescope.actions')
 local trouble = require('trouble.providers.telescope')
@@ -576,9 +571,6 @@ telescope.setup {
     },
   },
 }
-
--- load project.nvim extension for telescope
-telescope.load_extension('projects')
 
 -- add leader shortcuts with telescope
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers)
