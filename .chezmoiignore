@@ -1,0 +1,12 @@
+{{ if ne .chezmoi.os "windows" }}
+AppData
+AppData**
+{{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+.config/nvim/init.lua
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+.config/nvim/init.lua
+{{ end }}
