@@ -1,4 +1,3 @@
--- last updated: 2022-10-20
 -- automatically install packer
 local install_path = vim.fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
@@ -26,6 +25,9 @@ require('packer').startup({function()
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'neovim/nvim-lspconfig',
+
+    -- linting for non-lsp servers
+    'jose-elias-alvarez/null-ls.nvim',
   }
 
   -- autocompletion
@@ -34,9 +36,6 @@ require('packer').startup({function()
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
-
-  -- linting for non-lsp servers
-  use 'jose-elias-alvarez/null-ls.nvim'
 
   -- content
   -- vipga/gaip to start interactive EasyAlign
@@ -149,6 +148,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- tokyo-night
 require'tokyonight'.setup {
   terminal_colors = true,
+  transparent = true,
   styles = {
       comments = { italic = true },
       keywords = { italic = true },
@@ -361,27 +361,28 @@ require'mason-lspconfig'.setup_handlers {
   end,
 }
 
--- typescript
-local function get_typescript_server_path(root_dir)
-  local global_ts = '/opt/homebrew/lib/node_modules/typescript/lib/tsserverlibrary.js'
-  local found_ts = ''
-  local function check_dir(path)
-    found_ts = nvim_lsp_util.path.join(path, 'node_modules', 'typescript', 'lib', 'tsserverlibrary.js')
-    if nvim_lsp_util.path.exists(found_ts) then
-      return path
-    end
-  end
-  if nvim_lsp_util.search_ancestors(root_dir, check_dir) then
-    return found_ts
-  else
-    return global_ts
-  end
-end
+local null_ls = require('null-ls')
 
-local function on_new_config(new_config, new_root_dir)
-  new_config.init_options.typescript.serverPath = get_typescript_server_path(new_root_dir)
-end
+null_ls.setup({
+  sources = {
+    null_ls.builtins.completion.spell,
 
+    -- stylua
+    null_ls.builtins.formatting.stylua.with({
+      condition = function (utils)
+        return utils.root_has_file({ "stylua.toml", ".stylua.toml" })
+      end,
+    }),
+
+    -- phpcs
+    null_ls.builtins.diagnostics.phpcs.with({
+      prefer_local = 'vendor/bin',
+      condition = function (utils)
+        return utils.root_has_file({ "composer.json", "phpcs.xml" })
+      end,
+    }),
+  }
+})
 
 -- golang: imports
 -- vim.api.nvim_create_autocmd('BufWritePre', {
@@ -424,18 +425,6 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = '*.go',
   callback = function () vim.api.nvim_command('setlocal omnifunc=v:lua.vim.lsp.omnifunc') end,
 })
-
--- lint
--- local null_ls = require('null-ls')
--- null_ls.setup({
---   root_dir = require('null-ls.utils').root_pattern("composer.json", ".git"),
---   diagnostics_format = "#{m} (#{c}) [#{s}]",
---   sources = {
---     null_ls.builtins.completion.spell,
---     null_ls.builtins.diagnostics.phpcs.with({ prefer_local = 'vendor/bin' }),
---     -- null_ls.builtins.formatting.phpcbf.with({ prefer_local = 'vendor/bin' }),
---   },
--- })
 
 -- trouble.nvim
 require'trouble'.setup {}
