@@ -79,7 +79,7 @@ require('packer').startup({function()
     },
   }
 
-  use 'folke/tokyonight.nvim'
+  use 'marko-cerovac/material.nvim'
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
@@ -145,23 +145,29 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- tokyo-night
-require'tokyonight'.setup {
-  terminal_colors = true,
-  transparent = true,
-  styles = {
-      comments = { italic = true },
-      keywords = { italic = true },
-      functions = {},
-      variables = {},
-      -- Background styles. Can be "dark", "transparent" or "normal"
-      sidebars = "dark",
-      floats = "dark",
-  },
-  sidebars = { "qf", "help" },
-}
+-- material theme
+vim.g.material_style = 'deep ocean'
 
-vim.api.nvim_command('colorscheme tokyonight')
+require('material').setup({
+  contrast = {
+    terminal = false,
+    sidebars = true,
+    float_windows = true,
+    cursor_line = true,
+    non_current_windows = true,
+  },
+
+  plugins = {
+    "gitsigns",
+    "indent-blankline",
+    "nvim-cmp",
+    "nvim-tree",
+    "telescope",
+    "trouble",
+  },
+})
+
+vim.cmd 'colorscheme material'
 
 -- lsp, completion, and nvim-treesitter
 local servers = {
@@ -515,7 +521,7 @@ require'nvim-tree'.setup({
 require('lualine').setup {
   options = {
     icons_enable = false,
-    theme = 'tokyonight',
+    theme = 'material',
     component_separators = '|',
     section_separators = '',
   },
