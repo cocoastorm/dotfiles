@@ -62,7 +62,11 @@ require('packer').startup({function()
   use 'lewis6991/spellsitter.nvim'
 
   -- treesitter
-  use {'nvim-treesitter/nvim-treesitter', run = 'TSUpdate'}
+  -- https://github.com/nvim-treesitter/nvim-treesitter/wiki/Installation#packernvim
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = function() require('nvim-treesitter.install').update({ with_sync = true}) end,
+  }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
 
   use {
@@ -144,6 +148,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
+
+-- vim.opt.foldmethod     = 'expr'
+-- vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+---WORKAROUND
+vim.api.nvim_create_autocmd({'BufEnter','BufAdd','BufNew','BufNewFile','BufWinEnter'}, {
+  group = vim.api.nvim_create_augroup('TS_FOLD_WORKAROUND', {}),
+  callback = function()
+    vim.opt.foldmethod     = 'expr'
+    vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+  end
+})
+---ENDWORKAROUND
 
 -- material theme
 vim.g.material_style = 'deep ocean'
