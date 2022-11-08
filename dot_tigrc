@@ -1,0 +1,3 @@
+bind status <Ctrl-A> !git commit --amend
+bind status P !git push -u
+bind status <Ctrl-P> !git push --force -u
