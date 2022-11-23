@@ -1,0 +1,1 @@
+{{- template "ftplugin/go.lua" . -}}
