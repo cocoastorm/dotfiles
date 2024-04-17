@@ -8,6 +8,11 @@
 [pull]
   rebase = false
 
+[push]
+  default = current
+  followTags = true
+  autoSetupRemote = true
+
 [rerere]
   enabled = true
 
