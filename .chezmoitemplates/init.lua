@@ -13,7 +13,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  { 'folke/tokyonight.nvim', lazy = false, priority = 1000, opts = {} },
+  { '{{ .themepkg }}', lazy = false, priority = 1000, opts = {} },
   'folke/which-key.nvim',
 
   -- editorconfig
@@ -62,10 +62,72 @@ require('lazy').setup({
   {
     'nvim-treesitter/nvim-treesitter',
     build = ":TSUpdate",
-    dependencies = {'nvim-treesitter/nvim-treesitter-textobjects'},
     config = function ()
-      local configs = require('nvim-treesitter.configs')
-      configs.setup({ highlight = { enable = true }, indent = { enable = true } })
+      local configs = require('nvim-treesitter.configs') 
+    	configs.setup({
+        ensure_installed = {
+          'javascript',
+          'typescript',
+          'json',
+          'lua',
+          'go',
+          'php',
+          'toml',
+          'yaml',
+        },
+
+        highlight = {
+          enable = true,
+          disable = { "toml", "yaml", "vim" }, -- disabling toml and yaml because their parsers are causing crashes on Windows. :upside_down:
+          additional_vim_regex_highlighting = false,
+        },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = 'gnn',
+            node_incremental = 'grn',
+            scope_incremental = 'grc',
+            node_decremental = 'grm',
+          },
+         },
+         indent = {
+          enable = true,
+          disable = { 'yaml' }
+         },
+         textobjects = {
+          select = {
+            enable = true,
+            lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
+            keymaps = {
+              -- You can use the capture groups defined in textobjects.scm
+              ['af'] = '@function.outer',
+              ['if'] = '@function.inner',
+              ['ac'] = '@class.outer',
+              ['ic'] = '@class.inner',
+            },
+          },
+          move = {
+            enable = true,
+            set_jumps = true, -- whether to set jumps in the jumplist
+            goto_next_start = {
+              [']m'] = '@function.outer',
+              [']]'] = '@class.outer',
+            },
+            goto_next_end = {
+              [']M'] = '@function.outer',
+              [']['] = '@class.outer',
+            },
+            goto_previous_start = {
+              ['[m'] = '@function.outer',
+              ['[['] = '@class.outer',
+            },
+            goto_previous_end = {
+              ['[M'] = '@function.outer',
+              ['[]'] = '@class.outer',
+            },
+          },
+         },
+       })
     end
   },
 
@@ -91,8 +153,6 @@ require('lazy').setup({
   },
 })
 
--- folke/tokyonight
-vim.cmd[[colorscheme tokyonight]]
 
 -- colors and font
 vim.opt.termguicolors = true
@@ -143,6 +203,29 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
+
+{{- if eq .themename "material" }}
+require('material').setup({
+  contrast = {
+    terminal = false,
+    sidebars = true,
+    float_windows = true,
+    cursor_line = true,
+    non_current_windows = true,
+  },
+
+  plugins = {
+    'gitsigns',
+    'indent-blankline',
+    'nvim-cmp',
+    'telescope',
+    'trouble',
+  }
+})
+vim.g.material_style = "deep ocean"
+{{- end }}
+
+vim.cmd[[colorscheme {{ .themename }}]]
 
 -- mason.nvim
 require('mason').setup({
@@ -384,82 +467,11 @@ vim.api.nvim_create_autocmd('FileType', {
 -- trouble.nvim
 require'trouble'.setup {}
 
- -- treesitter
- require'nvim-treesitter.configs'.setup {
-  ensure_installed = {
-    'html',
-    'css',
-    'scss',
-    'javascript',
-    'typescript',
-    'json',
-    'lua',
-    'go',
-    'php',
-    'rust',
-    'toml',
-    'vue',
-    'yaml',
-  },
-
-  highlight = {
-    enable = true,
-    disable = { "toml", "yaml", "vim" }, -- disabling toml and yaml because their parsers are causing crashes on Windows. :upside_down:
-    additional_vim_regex_highlighting = false,
-  },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = 'gnn',
-      node_incremental = 'grn',
-      scope_incremental = 'grc',
-      node_decremental = 'grm',
-    },
-   },
-   indent = {
-    enable = true,
-    disable = { 'yaml' }
-   },
-   textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
-   },
- }
-
 -- statusbar
 require('lualine').setup {
   options = {
     icons_enable = false,
-    theme = 'tokyonight',
+    theme = '{{ .themename }}',
     component_separators = '|',
     section_separators = '',
   },
@@ -484,7 +496,7 @@ require('gitsigns').setup {
 
 -- Telescope
 local actions = require('telescope.actions')
-local trouble = require('trouble.providers.telescope')
+local open_with_trouble = require('trouble.sources.telescope').open
 
 local telescope = require('telescope')
 
@@ -494,10 +506,10 @@ telescope.setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
-        ['<C-t>'] = trouble.open_with_trouble,
+        ['<C-t>'] = open_with_trouble,
       },
       n = {
-        ['<C-t>'] = trouble.open_with_trouble,
+        ['<C-t>'] = open_with_trouble,
       },
     },
   },

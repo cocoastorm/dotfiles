@@ -1,1 +1,5 @@
-{{- template "init.lua" . -}}
+{{- if eq .chezmoi.hostname "khoa-mac" }}
+{{- template "init.lua" dict "themepkg" "marko-cerovac/material.nvim" "themename" "material" -}}
+{{ else }}
+{{- template "init.lua" dict "themepkg" "folke/tokyonight.nvim" "themename" "tokyonight" -}}
+{{- end }}
