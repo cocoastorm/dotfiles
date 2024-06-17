@@ -71,14 +71,12 @@ require('lazy').setup({
           'json',
           'lua',
           'go',
-          'php',
           'toml',
           'yaml',
         },
 
         highlight = {
           enable = true,
-          disable = { "toml", "yaml", "vim" }, -- disabling toml and yaml because their parsers are causing crashes on Windows. :upside_down:
           additional_vim_regex_highlighting = false,
         },
         incremental_selection = {
@@ -89,44 +87,7 @@ require('lazy').setup({
             scope_incremental = 'grc',
             node_decremental = 'grm',
           },
-         },
-         indent = {
-          enable = true,
-          disable = { 'yaml' }
-         },
-         textobjects = {
-          select = {
-            enable = true,
-            lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
-            keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              [']m'] = '@function.outer',
-              [']]'] = '@class.outer',
-            },
-            goto_next_end = {
-              [']M'] = '@function.outer',
-              [']['] = '@class.outer',
-            },
-            goto_previous_start = {
-              ['[m'] = '@function.outer',
-              ['[['] = '@class.outer',
-            },
-            goto_previous_end = {
-              ['[M'] = '@function.outer',
-              ['[]'] = '@class.outer',
-            },
-          },
-         },
+         }
        })
     end
   },
@@ -204,7 +165,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
-{{- if eq .themename "material" }}
+{{ if eq .themename "material" }}
 require('material').setup({
   contrast = {
     terminal = false,
