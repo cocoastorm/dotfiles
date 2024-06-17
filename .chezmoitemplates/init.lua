@@ -95,10 +95,16 @@ require('lazy').setup({
   -- neo-tree.nvim
   {
     'nvim-neo-tree/neo-tree.nvim',
-    keys = {
-      { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "Neotree" },
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
     },
-    config = function()
+    keys = {
+      { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
+    },
+    config = function ()
       require("neo-tree").setup()
     end,
   },
@@ -494,11 +500,6 @@ vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles)
 -- keymaps
 -- <esc> as double ;
 vim.api.nvim_set_keymap('x', ';;', '<esc>', opts)
-
--- nvim-tree
-vim.api.nvim_set_keymap('n', '<C-n>', ':NvimTreeToggle<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>r', ':NvimTreeRefresh', opts)
-vim.api.nvim_set_keymap('n', '<leader>n', ':NvimTreeFindFile', opts)
 
 -- trouble.nvim
 vim.api.nvim_set_keymap('n', '<leader>xx', '<cmd>Trouble<cr>', opts)
