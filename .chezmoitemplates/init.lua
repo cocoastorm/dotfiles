@@ -61,9 +61,11 @@ require('lazy').setup({
   -- https://github.com/nvim-treesitter/nvim-treesitter/wiki/Installation#lazynvim
   {
     'nvim-treesitter/nvim-treesitter',
-    build = ":TSUpdate",
+    build = function ()
+      local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+    end,
     config = function ()
-      local configs = require('nvim-treesitter.configs') 
+      local configs = require('nvim-treesitter.configs')
     	configs.setup({
         ensure_installed = {
           'javascript',
