@@ -5,7 +5,7 @@ background = "0x0f111a"
 foreground = "0xa6accd"
 
 [colors.bright]
-black = "0x000000"
+black = "0xff262b"
 blue = "0x82aaff"
 cyan = "0x89ddff"
 green = "0xc3e88d"
@@ -15,7 +15,7 @@ white = "0xeeffff"
 yellow = "0xffcb6b"
 
 [colors.normal]
-black = "0x000000"
+black = "0x666666"
 blue = "0x6e98eb"
 cyan = "0x71c6e7"
 green = "0xabcf76"
