@@ -1,3 +1,8 @@
+-- remap space as leader key
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.g.mapleader = ' '
+vim.g.maplocalleader = '\\'
+
 -- folke/lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -27,7 +32,7 @@ require('lazy').setup({
   'neovim/nvim-lspconfig',
 
   -- linting for non-lsp servers
-  'jose-elias-alvarez/null-ls.nvim',
+  'nvimtools/none-ls.nvim',
 
   -- autocompletion
   'hrsh7th/cmp-nvim-lsp',
@@ -67,16 +72,6 @@ require('lazy').setup({
     config = function ()
       local configs = require('nvim-treesitter.configs')
     	configs.setup({
-        ensure_installed = {
-          'javascript',
-          'typescript',
-          'json',
-          'lua',
-          'go',
-          'toml',
-          'yaml',
-        },
-
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = false,
@@ -132,11 +127,6 @@ vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h11'
 -- vim.g.do_filetype_lua = 1
 -- vim.g.do_did_load_filetypes = 0
 
--- remap space as leader key
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 -- enable mouse
 vim.opt.mouse = 'a'
 
@@ -173,6 +163,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
+
 require('material').setup({
   contrast = {
     terminal = false,
@@ -190,6 +181,7 @@ require('material').setup({
     'trouble',
   }
 })
+vim.g.material_style = "deep ocean"
 
 vim.cmd[[colorscheme material]]
 
@@ -512,4 +504,5 @@ vim.api.nvim_set_keymap('n', 'gR', '<cmd>Trouble lsp_references<cr>', opts)
 local easy_align_opts = { noremap = false, silent = true }
 vim.api.nvim_set_keymap('n', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
 vim.api.nvim_set_keymap('x', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
+
 
