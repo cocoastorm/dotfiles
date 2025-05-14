@@ -1,103 +1,127 @@
--- automatically install packer
-local install_path = vim.fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-  packer_bootstrap = vim.fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+-- folke/lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
 end
+vim.opt.rtp:prepend(lazypath)
 
--- autocommand that reloads neovim whenever you save the plugins.lua file
-local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
-vim.api.nvim_create_autocmd('BufWritePost', { command = 'source <afile> | PackerCompile', group = packer_group, pattern = 'init.lua' })
-
-require('packer').startup({function()
-  use 'wbthomason/packer.nvim' -- Package manager
-
-  -- used by a lot of lua plugins
-  use 'nvim-lua/plenary.nvim'
-  use 'nvim-lua/popup.nvim'
+require('lazy').setup({
+  { 'marko-cerovac/material.nvim', lazy = false, priority = 1000, opts = {} },
+  'folke/which-key.nvim',
 
   -- editorconfig
-  use 'gpanders/editorconfig.nvim'
+  'gpanders/editorconfig.nvim',
 
   -- lsp config
-  use 'b0o/schemastore.nvim'
+  'b0o/schemastore.nvim',
 
-  use {
-    'williamboman/mason.nvim',
-    'williamboman/mason-lspconfig.nvim',
-    'neovim/nvim-lspconfig',
+  'williamboman/mason.nvim',
+  'williamboman/mason-lspconfig.nvim',
+  'neovim/nvim-lspconfig',
 
-    -- linting for non-lsp servers
-    'jose-elias-alvarez/null-ls.nvim',
-  }
+  -- linting for non-lsp servers
+  'jose-elias-alvarez/null-ls.nvim',
 
   -- autocompletion
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/cmp-buffer'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/cmp-cmdline'
-  use 'hrsh7th/nvim-cmp'
+  'hrsh7th/cmp-nvim-lsp',
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
+  'hrsh7th/cmp-cmdline',
+  'hrsh7th/nvim-cmp',
 
-  -- content
   -- vipga/gaip to start interactive EasyAlign
-  use 'junegunn/vim-easy-align'
-  use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
-  use 'lukas-reineke/indent-blankline.nvim' -- add indentation guides even on blank lines 
+  'junegunn/vim-easy-align',
+  -- "gc" to comment visual regions/lines
+  'numToStr/Comment.nvim',
+  -- add indentation guides even on blank lines
+  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 
-  use 'folke/lsp-colors.nvim'
+  'folke/lsp-colors.nvim',
+  'folke/trouble.nvim',
 
-  use {
-    'folke/trouble.nvim',
-    requires = 'kyazdani42/nvim-web-devicons',
-  }
-
-  -- statusline
-  use 'nvim-lualine/lualine.nvim' -- fancier statusline
+  -- fancier statusline
+  'nvim-lualine/lualine.nvim',
 
   -- snippets
-  use 'hrsh7th/cmp-vsnip'
-  use 'hrsh7th/vim-vsnip'
+  'hrsh7th/cmp-vsnip',
+  'hrsh7th/vim-vsnip',
 
   -- git and spellcheck
-  use 'lewis6991/gitsigns.nvim'
-  use 'lewis6991/spellsitter.nvim'
+  'lewis6991/gitsigns.nvim',
+  'lewis6991/spellsitter.nvim',
 
   -- treesitter
-  -- https://github.com/nvim-treesitter/nvim-treesitter/wiki/Installation#packernvim
-  use {
+  -- https://github.com/nvim-treesitter/nvim-treesitter/wiki/Installation#lazynvim
+  {
     'nvim-treesitter/nvim-treesitter',
-    run = function() require('nvim-treesitter.install').update({ with_sync = true}) end,
-  }
-  use 'nvim-treesitter/nvim-treesitter-textobjects'
+    build = function ()
+      local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
+    end,
+    config = function ()
+      local configs = require('nvim-treesitter.configs')
+    	configs.setup({
+        ensure_installed = {
+          'javascript',
+          'typescript',
+          'json',
+          'lua',
+          'go',
+          'toml',
+          'yaml',
+        },
 
-  use {
-    'kyazdani42/nvim-tree.lua',
-    requires = {
-      {'kyazdani42/nvim-web-devicons'},
-    },
-  }
-
-  use {
-    'nvim-telescope/telescope.nvim',
-    requires = {
-      {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'}
-    },
-  }
-
-  use 'marko-cerovac/material.nvim'
-
-  -- Automatically set up your configuration after cloning packer.nvim
-  -- Put this at the end after all plugins
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end,
-config = {
-  display = {
-    open_fn = function ()
-      return require('packer.util').float({ border = 'single' })
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = false,
+        },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = 'gnn',
+            node_incremental = 'grn',
+            scope_incremental = 'grc',
+            node_decremental = 'grm',
+          },
+         }
+       })
     end
-  }
-}})
+  },
+
+  -- neo-tree.nvim
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    keys = {
+      { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
+    },
+    config = function ()
+      require("neo-tree").setup()
+    end,
+  },
+
+  -- telescope.nvim
+  {
+    'nvim-telescope/telescope.nvim',
+    tag = '0.1.5',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' },
+    },
+  },
+})
+
 
 -- colors and font
 vim.opt.termguicolors = true
@@ -127,7 +151,7 @@ vim.opt.showmatch = true
 vim.opt.laststatus = 3
 
 -- white characters
-vim.opt.autoindent = true
+vim.opt.autoindent = false 
 vim.opt.smartindent = true
 vim.opt.breakindent = true
 vim.opt.tabstop = 2
@@ -149,9 +173,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
--- material theme
-vim.g.material_style = 'deep ocean'
-
 require('material').setup({
   contrast = {
     terminal = false,
@@ -162,27 +183,15 @@ require('material').setup({
   },
 
   plugins = {
-    "gitsigns",
-    "indent-blankline",
-    "nvim-cmp",
-    "nvim-tree",
-    "telescope",
-    "trouble",
-  },
+    'gitsigns',
+    'indent-blankline',
+    'nvim-cmp',
+    'telescope',
+    'trouble',
+  }
 })
 
-vim.cmd 'colorscheme material'
-
--- lsp, completion, and nvim-treesitter
-local servers = {
-  "bashls",
-  "cssls",
-  "pyright",
-  "rust_analyzer",
-  "sumneko_lua",
-  "taplo",
-  "yamlls",
-}
+vim.cmd[[colorscheme material]]
 
 -- mason.nvim
 require('mason').setup({
@@ -195,7 +204,17 @@ require('mason').setup({
   }
 })
 
-require('mason-lspconfig').setup{}
+require('mason-lspconfig').setup {
+  ensure_installed = {
+    'bashls',
+    'jsonls',
+    'taplo',
+    'yamlls',
+    'pyright',
+    'gopls',
+    'rust_analyzer',
+  }
+}
 
 -- autocompletion
 local cmp = require'cmp'
@@ -414,88 +433,6 @@ vim.api.nvim_create_autocmd('FileType', {
 -- trouble.nvim
 require'trouble'.setup {}
 
- -- treesitter
- require'nvim-treesitter.configs'.setup {
-  ensure_installed = {
-    'html',
-    'css',
-    'scss',
-    'javascript',
-    'typescript',
-    'json',
-    'lua',
-    'go',
-    'php',
-    'rust',
-    'toml',
-    'vue',
-    'yaml',
-  },
-
-  highlight = {
-    enable = true,
-    disable = { "toml", "yaml", "vim" }, -- disabling toml and yaml because their parsers are causing crashes on Windows. :upside_down:
-    additional_vim_regex_highlighting = false,
-  },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = 'gnn',
-      node_incremental = 'grn',
-      scope_incremental = 'grc',
-      node_decremental = 'grm',
-    },
-   },
-   indent = {
-    enable = true,
-    disable = { 'yaml' }
-   },
-   textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
-   },
- }
-
--- nvimtree
-require'nvim-web-devicons'.setup()
-require'nvim-tree'.setup({
-  sync_root_with_cwd = true,
-  respect_buf_cwd = true,
-  update_focused_file = {
-    enable = true,
-    update_root = true,
-  },
-})
-
 -- statusbar
 require('lualine').setup {
   options = {
@@ -504,21 +441,13 @@ require('lualine').setup {
     component_separators = '|',
     section_separators = '',
   },
-  disabled_filetypes = { 'packer' },
-  extensions = { 'nvim-tree' },
 }
 
 -- enable Comment.nvim
 require('Comment').setup()
 
 -- indent blankline
-require('indent_blankline').setup {
-  char = '┊',
-  show_trailing_blankline_indent = false,
-  space_char_blankline = " ",
-  show_current_context = true,
-  show_current_context_start = true,
-}
+require('ibl').setup { indent = { char = '┊' }}
 
 -- gitsigns
 require('gitsigns').setup {
@@ -533,7 +462,7 @@ require('gitsigns').setup {
 
 -- Telescope
 local actions = require('telescope.actions')
-local trouble = require('trouble.providers.telescope')
+local open_with_trouble = require('trouble.sources.telescope').open
 
 local telescope = require('telescope')
 
@@ -543,10 +472,10 @@ telescope.setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
-        ['<C-t>'] = trouble.open_with_trouble,
+        ['<C-t>'] = open_with_trouble,
       },
       n = {
-        ['<C-t>'] = trouble.open_with_trouble,
+        ['<C-t>'] = open_with_trouble,
       },
     },
   },
@@ -570,11 +499,6 @@ vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles)
 -- keymaps
 -- <esc> as double ;
 vim.api.nvim_set_keymap('x', ';;', '<esc>', opts)
-
--- nvim-tree
-vim.api.nvim_set_keymap('n', '<C-n>', ':NvimTreeToggle<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>r', ':NvimTreeRefresh', opts)
-vim.api.nvim_set_keymap('n', '<leader>n', ':NvimTreeFindFile', opts)
 
 -- trouble.nvim
 vim.api.nvim_set_keymap('n', '<leader>xx', '<cmd>Trouble<cr>', opts)
