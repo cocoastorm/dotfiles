@@ -1,9 +1,6 @@
 [user]
   name = Khoa Nguyen
-  email = khoa.tan.nguyen.96@gmail.com
-
-[includeIf "gitdir:~/tunezilla/"]
-  path = ~/tunezilla/.gitconfig
+  email = cocoastorm@proton.me
 
 [pull]
   rebase = false

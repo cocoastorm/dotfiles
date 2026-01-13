@@ -27,8 +27,12 @@ require('lazy').setup({
   -- lsp config
   'b0o/schemastore.nvim',
 
+  -- Mason for LSP server management
   'williamboman/mason.nvim',
-  'williamboman/mason-lspconfig.nvim',
+  {
+    'williamboman/mason-lspconfig.nvim',
+    dependencies = { 'neovim/nvim-lspconfig' },
+  },
   'neovim/nvim-lspconfig',
 
   -- linting for non-lsp servers
@@ -122,11 +126,6 @@ require('lazy').setup({
 vim.opt.termguicolors = true
 vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h11'
 
--- use filetype.lua
--- see https://github.com/neovim/neovim/pull/16600
--- vim.g.do_filetype_lua = 1
--- vim.g.do_did_load_filetypes = 0
-
 -- enable mouse
 vim.opt.mouse = 'a'
 
@@ -150,7 +149,7 @@ vim.opt.expandtab = true
 
 -- list chars
 vim.opt.list = true
-vim.opt.listchars:append("space:⋅")
+vim.opt.listchars:append("space:·")
 vim.opt.listchars:append("eol:↴")
 
 -- highlight on yank
@@ -185,7 +184,11 @@ vim.g.material_style = "deep ocean"
 
 vim.cmd[[colorscheme material]]
 
--- mason.nvim
+-- ============================================================================
+-- MASON & LSP SETUP (Updated for Mason 2.0 and Neovim 0.11+)
+-- ============================================================================
+
+-- 1. Setup Mason
 require('mason').setup({
   ui = {
     icons = {
@@ -196,7 +199,8 @@ require('mason').setup({
   }
 })
 
-require('mason-lspconfig').setup {
+-- 2. Setup Mason-LSPConfig with servers to auto-install
+require('mason-lspconfig').setup({
   ensure_installed = {
     'bashls',
     'jsonls',
@@ -205,10 +209,172 @@ require('mason-lspconfig').setup {
     'pyright',
     'gopls',
     'rust_analyzer',
-  }
-}
+  },
+  automatic_installation = false,
+})
 
--- autocompletion
+-- 3. Get capabilities for nvim-cmp
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- 4. Global LSP configuration for all servers
+vim.lsp.config('*', {
+  capabilities = capabilities,
+})
+
+-- 5. Configure specific LSP servers using vim.lsp.config()
+
+-- Bash
+vim.lsp.config('bashls', {
+  filetypes = { 'sh', 'bash' },
+})
+
+-- JSON with schemastore
+vim.lsp.config('jsonls', {
+  settings = {
+    json = {
+      schemas = require('schemastore').json.schemas({
+        ignore = {
+          '.eslintrc',
+          'package.json',
+        },
+      }),
+      validate = { enable = true },
+    }
+  }
+})
+
+-- TOML
+vim.lsp.config('taplo', {
+  filetypes = { 'toml' },
+})
+
+-- YAML
+vim.lsp.config('yamlls', {
+  settings = {
+    yaml = {
+      schemas = {},
+    }
+  }
+})
+
+-- Python
+vim.lsp.config('pyright', {
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+      },
+    },
+  },
+})
+
+-- Go
+vim.lsp.config('gopls', {
+  cmd = {"gopls", "serve"},
+  settings = {
+    gopls = {
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+    },
+  },
+})
+
+-- Rust
+vim.lsp.config('rust_analyzer', {
+  settings = {
+    ['rust-analyzer'] = {
+      checkOnSave = {
+        command = "clippy"
+      },
+    },
+  },
+})
+
+-- TypeScript (if you have tsserver/ts_ls)
+-- vim.lsp.config('ts_ls', {})
+
+-- Vue (if you have volar)
+-- Note: For Vue with TypeScript plugin, you'll need to set up the plugin path
+-- local vue_ls_path = vim.fn.expand("$MASON/packages/vue-language-server")
+-- local vue_plugin_path = vue_ls_path .. "/node_modules/@vue/language-server"
+-- vim.lsp.config('ts_ls', {
+--   init_options = {
+--     plugins = {
+--       {
+--         name = "@vue/typescript-plugin",
+--         location = vue_plugin_path,
+--         languages = { "vue" },
+--       },
+--     },
+--   },
+--   filetypes = { "typescript", "javascript", "vue" },
+-- })
+
+-- PHP Intelephense (if you use it)
+-- vim.lsp.config('intelephense', {
+--   init_options = { 
+--     licenceKey = vim.fn.stdpath('config')..'/intelephense-license.txt' 
+--   },
+-- })
+
+-- PHP Psalm
+-- vim.lsp.config('psalm', {
+--   root_dir = function(fname)
+--     return vim.fs.dirname(vim.fs.find({'composer.json', 'psalm.xml'}, { upward = true })[1])
+--   end
+-- })
+
+-- 6. Enable all configured LSP servers
+-- This tells Neovim to auto-start these servers when appropriate filetypes are opened
+vim.lsp.enable({
+  'bashls',
+  'jsonls', 
+  'taplo',
+  'yamlls',
+  'pyright',
+  'gopls',
+  'rust_analyzer',
+  -- Add any other servers you want to enable
+})
+
+-- 7. LSP keymaps and on_attach replacement
+-- In Neovim 0.11+, use LspAttach autocmd instead of on_attach
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    local bufnr = ev.buf
+    local opts = { buffer = bufnr, noremap = true, silent = true }
+    
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<leader>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', '<leader>so', function()
+      require("telescope.builtin").lsp_document_symbols()
+    end, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<leader>f', function()
+      vim.lsp.buf.format({ async = true })
+    end, opts)
+  end,
+})
+
+-- ============================================================================
+-- AUTOCOMPLETION (nvim-cmp)
+-- ============================================================================
+
 local cmp = require'cmp'
 
 cmp.setup({
@@ -226,7 +392,7 @@ cmp.setup({
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
   }),
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
@@ -239,13 +405,13 @@ cmp.setup({
 -- Set configuration for specific filetype.
 cmp.setup.filetype('gitcommit', {
   sources = cmp.config.sources({
-    { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    { name = 'cmp_git' },
   }, {
     { name = 'buffer' },
   })
 })
 
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+-- Use buffer source for `/`
 cmp.setup.cmdline('/', {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
@@ -253,7 +419,7 @@ cmp.setup.cmdline('/', {
   }
 })
 
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+-- Use cmdline & path source for ':'
 cmp.setup.cmdline(':', {
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
@@ -263,124 +429,29 @@ cmp.setup.cmdline(':', {
   })
 })
 
--- Mappings.
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
+-- ============================================================================
+-- DIAGNOSTICS
+-- ============================================================================
+
+-- Diagnostic keymaps
 local opts = { noremap=true, silent=true }
-vim.api.nvim_set_keymap('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-vim.api.nvim_set_keymap('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
 
--- Use an on_attach function to only map the following keys
--- after the language server attaches to the current buffer
-local on_attach = function(_, bufnr)
-  -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>so', '<cmd>lua require("telescope.builtin").lsp_document_symbols()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>f', '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', opts)
-end
+-- Configure diagnostic display
+vim.diagnostic.config({
+  virtual_text = false,  -- Disable inline diagnostic text by default
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+})
 
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
-
--- autocompletion with lsp
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-local nvim_lsp = require('lspconfig')
-
-require'mason-lspconfig'.setup_handlers {
-  -- the first entry (without a key) will be the default handler
-  -- and will be called for each installed server that doesn't have
-  -- a dedicated handler
-  function (server_name) -- default handler
-    nvim_lsp[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-    }
-  end,
-
-  -- jsonls
-  ["jsonls"] = function ()
-    nvim_lsp.jsonls.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = {
-        json = {
-          schemas = require('schemastore').json.schemas {
-            ignore = {
-              '.eslintrc',
-              'package.json',
-            },
-          },
-          validate = { enable = true },
-        }
-      }
-    }
-  end,
-
-  -- typescript
-  ["tsserver"] = function ()
-    nvim_lsp.tsserver.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-    }
-  end,
-
-  ["volar"] = function ()
-    nvim_lsp.volar.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-    }
-  end,
-
-  -- intelephense
-  ["intelephense"] = function ()
-    nvim_lsp.intelephense.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      init_options = { licenceKey = vim.fn.stdpath('config')..'/intelephense-license.txt' },
-    }
-  end,
-
-  -- psalm
-  ["psalm"] = function ()
-    nvim_lsp.psalm.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      root_dir = nvim_lsp.util.root_pattern("composer.json", "psalm.xml")
-    }
-  end,
-
-  -- gopls
-  ["gopls"] = function ()
-    nvim_lsp.gopls.setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      cmd = {"gopls", "serve"},
-      root_dir = nvim_lsp.util.root_pattern("go.mod"),
-      settings = {
-        gopls = {
-          analyses = {
-            unusedparams = true,
-          },
-          staticcheck = true,
-        },
-      },
-    }
-  end,
-}
+-- ============================================================================
+-- NULL-LS (none-ls)
+-- ============================================================================
 
 local null_ls = require('null-ls')
 
@@ -405,22 +476,9 @@ null_ls.setup({
   }
 })
 
--- nvim lsp: disable virtual text
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics, {
-    underline = true,
-    virtual_text = function(namespace, bufnr)
-      return vim.b[bufnr].show_virtual_text == true
-    end,
-    signs = true,
-    update_in_insert = false
-  }
-)
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = '*.go',
-  callback = function () vim.api.nvim_command('setlocal omnifunc=v:lua.vim.lsp.omnifunc') end,
-})
+-- ============================================================================
+-- OTHER PLUGIN CONFIGS
+-- ============================================================================
 
 -- trouble.nvim
 require'trouble'.setup {}
@@ -473,7 +531,11 @@ telescope.setup {
   },
 }
 
--- add leader shortcuts with telescope
+-- ============================================================================
+-- KEYMAPS
+-- ============================================================================
+
+-- telescope shortcuts
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers)
 vim.keymap.set('n', '<leader>sf', function ()
   require('telescope.builtin').find_files { previewer = false }
@@ -488,21 +550,18 @@ vim.keymap.set('n', '<leader>so', function()
 end)
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles)
 
--- keymaps
 -- <esc> as double ;
-vim.api.nvim_set_keymap('x', ';;', '<esc>', opts)
+vim.keymap.set('x', ';;', '<esc>', opts)
 
 -- trouble.nvim
-vim.api.nvim_set_keymap('n', '<leader>xx', '<cmd>Trouble<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>xw', '<cmd>Trouble workspace_diagnostics<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>xd', '<cmd>Trouble document_diagnostics<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>xl', '<cmd>Trouble loclist<cr>', opts)
-vim.api.nvim_set_keymap('n', '<leader>xq', '<cmd>Trouble quickfix<cr>', opts)
-vim.api.nvim_set_keymap('n', 'gR', '<cmd>Trouble lsp_references<cr>', opts)
+vim.keymap.set('n', '<leader>xx', '<cmd>Trouble<cr>', opts)
+vim.keymap.set('n', '<leader>xw', '<cmd>Trouble workspace_diagnostics<cr>', opts)
+vim.keymap.set('n', '<leader>xd', '<cmd>Trouble document_diagnostics<cr>', opts)
+vim.keymap.set('n', '<leader>xl', '<cmd>Trouble loclist<cr>', opts)
+vim.keymap.set('n', '<leader>xq', '<cmd>Trouble quickfix<cr>', opts)
+vim.keymap.set('n', 'gR', '<cmd>Trouble lsp_references<cr>', opts)
 
 -- easy align
 local easy_align_opts = { noremap = false, silent = true }
-vim.api.nvim_set_keymap('n', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
-vim.api.nvim_set_keymap('x', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
-
-
+vim.keymap.set('n', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
+vim.keymap.set('x', 'ga', '<Plug>(EasyAlign)', easy_align_opts)
