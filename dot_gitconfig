@@ -2,6 +2,9 @@
   name = Khoa Nguyen
   email = cocoastorm@proton.me
 
+[includeIf "gitdir:~/powerbill/"]
+  path = ~/powerbill/.gitconfig
+
 [pull]
   rebase = false
 
