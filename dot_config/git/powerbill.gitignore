@@ -1,0 +1,10 @@
+# AI agentic assisted planning directories
+specs/
+plans/
+opencode.json
+
+# Laravel Boost specific
+.ai/
+
+# mise
+.mise.toml

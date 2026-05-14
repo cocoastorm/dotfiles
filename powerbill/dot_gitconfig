@@ -1,4 +1,6 @@
 [user]
   name = Khoa Nguyen
   email = khoa@powerbill.ca
+[core]
+  excludesfile = ~/.config/git/powerbill.gitignore
 
