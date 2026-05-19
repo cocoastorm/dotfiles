@@ -65,15 +65,32 @@ end
 
 -- Plugins
 require("lazy").setup({
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+      "TmuxNavigatorProcessList",
+    },
+    keys = {
+      { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
+
   -- Theme
   {
-    "olimorris/onedarkpro.nvim",
+    "catppuccin/nvim",
+    name = "catppuccin",
     priority = 1000,
     config = function()
-      require("onedarkpro").setup({
-        options = { transparency = true },
-      })
-      vim.cmd.colorscheme("onedark_dark")
+      vim.cmd.colorscheme("catppuccin-nvim")
     end,
   },
 
@@ -83,7 +100,7 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("lualine").setup({
-        options = { theme = "onedark" },
+        options = { theme = "catppuccin-nvim" },
       })
     end,
   },
