@@ -84,13 +84,37 @@ require("lazy").setup({
     },
   },
 
-  -- Theme
+  -- Theme: Night Owl (port of Sarah Drasner's VS Code Night Owl)
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "oxfist/night-owl.nvim",
+    name = "night-owl",
+    lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme("catppuccin-nvim")
+      require("night-owl").setup({
+        bold = true,
+        italics = true,
+        underline = true,
+        undercurl = true,
+        transparent_background = false,
+      })
+      vim.cmd.colorscheme("night-owl")
+
+      -- Re-apply overrides whenever this colorscheme is (re)loaded.
+      local function apply_night_owl_overrides()
+        -- Canonical Night Owl background is #011627; the port uses #021727.
+        vim.api.nvim_set_hl(0, "Normal", { fg = "#d6deeb", bg = "#011627" })
+        -- Plain @keyword (const/import/let/var/...) should be italic like the
+        -- screenshot; the port leaves it non-italic (only Statement links are).
+        vim.api.nvim_set_hl(0, "Keyword", { fg = "#c792ea", bg = "NONE", italic = true })
+        vim.api.nvim_set_hl(0, "@keyword", { fg = "#c792ea", bg = "NONE", italic = true })
+      end
+      apply_night_owl_overrides()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("NightOwlOverrides", { clear = true }),
+        pattern = "night-owl",
+        callback = apply_night_owl_overrides,
+      })
     end,
   },
 
@@ -100,22 +124,96 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("lualine").setup({
-        options = { theme = "catppuccin-nvim" },
+        options = { theme = "night-owl" },
       })
     end,
   },
 
-  -- Syntax highlighting
+  -- Tree-sitter parsers and native Neovim highlighting (requires Neovim 0.12+).
   {
-    "nvim-treesitter/nvim-treesitter",
-    branch = "master",
+    "neovim-treesitter/nvim-treesitter",
+    dependencies = { "neovim-treesitter/treesitter-parser-registry" },
+    lazy = false,
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "bash", "go", "lua", "markdown", "markdown_inline", "gitcommit", "python", "json", "yaml", "toml" },
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
+      local parsers = {
+        "bash",
+        "go",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "gitcommit",
+        "python",
+        "json",
+        "yaml",
+        "toml",
+        "javascript",
+        "typescript",
+        "tsx",
+      }
+
+      -- The 0.12 rewrite installs parsers and queries separately from highlighting.
+      require("nvim-treesitter").install(parsers)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = parsers,
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
+        end,
+      })
+    end,
+  },
+
+  -- File explorer
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    cmd = "Neotree",
+    keys = {
+      { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
+    },
+    config = function()
+      require("neo-tree").setup({
+        close_if_last_window = true,
+        window = {
+          width = 30,
+          mappings = {
+            ["<cr>"] = "open",
+            ["s"] = "open_vsplit",
+            ["S"] = "open_split",
+            ["t"] = "open_tabnew",
+            ["h"] = "toggle_hidden",
+            ["<bs>"] = "navigate_up",
+            ["."] = "set_root",
+            ["H"] = "toggle_hidden",
+            ["/"] = "fuzzy_finder",
+            ["D"] = "fuzzy_finder_directory",
+            ["#"] = "fuzzy_sorter",
+            ["<c-r>"] = "clear_filter",
+            ["a"] = { "add", config = { show_path = "relative" } },
+            ["c"] = { "copy", config = { show_path = "relative" } },
+            ["m"] = { "move", config = { show_path = "relative" } },
+            ["r"] = "rename",
+            ["d"] = "delete",
+            ["y"] = "copy_to_clipboard",
+            ["x"] = "cut_to_clipboard",
+            ["p"] = "paste_from_clipboard",
+          },
+        },
+        filesystem = {
+          filtered_items = {
+            visible = false,
+            hide_dotfiles = false,
+            hide_gitignored = true,
+          },
+          follow_current_file = {
+            enabled = true,
+          },
+          use_libuv_file_watcher = true,
         },
       })
     end,
@@ -266,7 +364,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- Diagnostics
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>de", vim.diagnostic.open_float, { noremap = true, silent = true, desc = "Diagnostic float" })
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { noremap = true, silent = true })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { noremap = true, silent = true })
