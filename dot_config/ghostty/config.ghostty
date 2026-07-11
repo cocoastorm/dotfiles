@@ -1,0 +1,41 @@
+# Minimal Ghostty config — optimized for tmux
+# Let tmux handle panes/windows/keybinds; Ghostty handles rendering.
+
+# ── Font ──
+font-family = "JetBrainsMono Nerd Font"
+font-size = 12
+
+# ── Theme ──
+theme = Night Owl
+
+# ── Window ──
+window-padding-x = 4
+window-padding-y = 4
+window-decoration = server
+window-save-state = always
+
+# ── Cursor ──
+cursor-style = block
+cursor-style-blink = false
+
+# ── Clipboard ──
+copy-on-select = clipboard
+clipboard-trim-trailing-spaces = true
+
+# ── Behavior ──
+confirm-close-surface = false
+mouse-hide-while-typing = true
+scrollback-limit = 100000
+
+# Keep Shift+Click reserved for bypassing tmux mouse capture (e.g. opening plain-text URLs)
+mouse-shift-capture = false
+
+# ── Shell Integration ──
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# ── Keybinds (fonts + reload only; tmux owns panes/tabs) ──
+keybind = ctrl+plus=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+zero=reset_font_size
+keybind = ctrl+shift+r=reload_config
