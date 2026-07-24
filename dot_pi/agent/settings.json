@@ -1,28 +1,29 @@
 {
-  "lastChangelogVersion": "0.79.1",
-  "defaultProvider": "deepseek",
-  "defaultModel": "deepseek-v4-pro",
+  "enableSkillCommands": true,
+  "lastChangelogVersion": "0.82.0",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
   "packages": [
-    "/home/khoa/pi-packages",
+    "/home/khoa/agent-stuff",
     "npm:@aliou/pi-synthetic",
     "npm:pi-simplify",
     "npm:pi-mcp-adapter",
-    "npm:@haispeed/pi-obsidian",
     "npm:@eko24ive/pi-ask",
     "npm:@tmustier/pi-usage-extension",
-    "npm:pi-token-burden",
-    "npm:@tintinweb/pi-subagents"
+    "npm:pi-token-burden"
   ],
   "enabledModels": [
     "deepseek/deepseek-v4-flash",
     "deepseek/deepseek-v4-pro",
-    "openai-codex/gpt-5.4",
-    "openai-codex/gpt-5.4-mini",
     "openai-codex/gpt-5.5",
-    "synthetic/hf:zai-org/GLM-5.1",
     "synthetic/hf:zai-org/GLM-4.7-Flash",
-    "synthetic/hf:moonshotai/Kimi-K2.6",
-    "synthetic/hf:Qwen/Qwen3.6-27B"
-  ]
+    "synthetic/hf:zai-org/GLM-5.2",
+    "synthetic/hf:MiniMaxAI/MiniMax-M3",
+    "synthetic/hf:moonshotai/Kimi-K2.7-Code",
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-luna",
+    "openai-codex/gpt-5.6-terra"
+  ],
+  "theme": "nightowl"
 }

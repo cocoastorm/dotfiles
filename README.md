@@ -63,7 +63,7 @@ Repos outside that folder use the personal email address.
 
 The pi settings include several add-ons. pi downloads the npm add-ons itself.
 
-One entry points to `/home/khoa/pi-packages`. That folder is not part of this repo, so create it separately or remove that entry on a computer where it does not exist.
+One entry points to `~/agent-stuff`. That folder is not part of this repo nor it is on Github, so remove that entry on a computer where it does not exist.
 
 Login details and API keys are not stored in this repo. Set those up separately.
 
