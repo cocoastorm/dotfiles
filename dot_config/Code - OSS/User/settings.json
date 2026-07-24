@@ -1,0 +1,194 @@
+{
+    // ── General Telemetry ──
+    "chat.disableAIFeatures": true,
+    "redhat.telemetry.enabled": false,
+
+    // ── Editor Appearance ──
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrainsMonoNL Nerd Font', 'monospace'",
+    "editor.fontSize": 14,
+    "editor.lineHeight": 24,
+    "editor.fontLigatures": true,
+    "editor.minimap.enabled": false,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.stickyScroll.enabled": true,
+
+    // ── Theme & Icons ──
+    "workbench.colorTheme": "Night Owl (No Italics)",
+    "workbench.iconTheme": "material-icon-theme",
+
+    "workbench.colorCustomizations": {
+        "[Night Owl]": {
+            "activityBar.background": "#000C1D",
+            "activityBar.border": "#102a44",
+            "editorGroup.border": "#102a44",
+            "sideBar.background": "#001122",
+            "sideBar.border": "#102a44",
+            "sideBar.foreground": "#8BADC1"
+        },
+        "[Night Owl (No Italics)]": {
+            "activityBar.background": "#000C1D",
+            "activityBar.border": "#102a44",
+            "editorGroup.border": "#102a44",
+            "sideBar.background": "#001122",
+            "sideBar.border": "#102a44",
+            "sideBar.foreground": "#8BADC1"
+        }
+    },
+    "editor.tokenColorCustomizations": {
+        "[Night Owl (No Italics)]": {
+            "textMateRules": [
+                {
+                    "name": "PHP $this",
+                    "scope": [
+                        "variable.language.this.php",
+                        "variable.language.this.php punctuation.definition.variable.php"
+                    ],
+                    "settings": {
+                        "foreground": "#41EEC6"
+                    }
+                },
+                {
+                    "name": "PHP object properties",
+                    "scope": "variable.other.property.php",
+                    "settings": {
+                        "foreground": "#BEC5D4"
+                    }
+                }
+            ]
+        }
+    },
+
+    // ── Terminal ──
+    // You said you use an external terminal. If you want the integrated one
+    // as well, set "terminal.integrated.automationShell.linux" instead.
+    "terminal.explorerKind": "external",
+    "terminal.external.linuxExec": "xterm",
+    // Remove this comment and set to your preferred terminal, e.g.:
+    // "terminal.external.linuxExec": "kitty",
+    // "terminal.external.linuxExec": "alacritty",
+
+    // ── Files ──
+    "files.autoSave": "off",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+
+    // ── Editor UX ──
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "editor.renderWhitespace": "selection",
+    "editor.rulers": [],
+    "workbench.startupEditor": "none",
+    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${appName}",
+
+    // ── Git (you use the terminal) ──
+    "git.enabled": true,
+    "git.decorations.enabled": false,
+    "git.autofetch": false,
+
+    // ══════════════════════════════════════
+    //  PHP CONFIGURATION
+    // ══════════════════════════════════════
+
+    // Intelephense
+    "intelephense.files.maxSize": 5000000,
+    "intelephense.completion.insertUseDeclaration": true,
+    "intelephense.trace.server": "off",
+
+    // PHP CS Fixer (format on save)
+    "php-cs-fixer.executablePath": "",
+    "php-cs-fixer.rules": "@PSR12",
+    "php-cs-fixer.formatOnSave": true,
+    "php-cs-fixer.onsave": true,
+    "php-cs-fixer.config": ".php-cs-fixer.dist.php",
+    "php-cs-fixer.allowRisky": false,
+
+    // PHPUnit
+    "phpunit.execpath": "",
+    "phpunit.php": "php",
+    "phpunit.args": [
+        "--colors=always"
+    ],
+
+    // PHP language-specific settings
+    "[php]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "junstyle.php-cs-fixer",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": false
+    },
+
+    // ══════════════════════════════════════
+    //  JAVASCRIPT / TYPESCRIPT / REACT
+    // ══════════════════════════════════════
+
+    // ESLint — do everything (lint + format via --fix)
+    "eslint.format.enable": true,
+    "eslint.run": "onSave",
+    "eslint.codeActionsOnSave.mode": "all",
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+
+    // Fix-all on save — this runs ESLint --fix
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+
+    // TS/JS language-specific settings
+    "[javascript]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[javascriptreact]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescript]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+
+    // Respect project's tsconfig — don't override with editor settings
+    "typescript.validate.enable": true,
+    "typescript.check.npmIsInstalled": false,
+    "typescript.updateImportsOnFileMove.enabled": "prompt",
+    "typescript.suggest.autoImports": true,
+    "javascript.suggest.autoImports": true,
+
+    // ══════════════════════════════════════
+    //  OTHER FILE TYPES
+    // ══════════════════════════════════════
+    "[json]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[jsonc]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[yaml]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[markdown]": {
+        "editor.wordWrap": "on"
+    },
+    "vsicons.dontShowNewVersionMessage": true
+}
