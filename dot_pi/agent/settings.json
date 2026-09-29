@@ -1,8 +1,8 @@
 {
   "enableSkillCommands": true,
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "0.99.1",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-sol",
+  "defaultModel": "gpt-6.1-sol",
   "defaultThinkingLevel": "medium",
   "subagents": {
     "agentOverrides": {
@@ -55,7 +55,10 @@
       ]
     },
     "npm:pi-simplify",
-    "npm:pi-mcp-adapter",
+    {
+      "source": "npm:pi-mcp-adapter",
+      "extensions": []
+    },
     "npm:@eko24ive/pi-ask",
     "npm:@tmustier/pi-usage-extension",
     "npm:pi-token-burden",
@@ -79,8 +82,8 @@
     "synthetic/hf:zai-org/GLM-5.3-Flash",
     "openai-codex/gpt-6-astra",
     "synthetic/hf:deepseek-ai/DeepSeek-V4.1-Flash",
-    "openai-codex/gpt-6-sol",
-    "openrouter/anthropic/claude-opus-5.5"
+    "openrouter/anthropic/claude-opus-5.5",
+    "openai-codex/gpt-6.1-sol"
   ],
   "theme": "nightowl",
   "terminal": {
