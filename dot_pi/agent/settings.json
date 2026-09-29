@@ -1,29 +1,90 @@
 {
   "enableSkillCommands": true,
-  "lastChangelogVersion": "0.82.0",
+  "lastChangelogVersion": "0.87.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-sol",
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "medium",
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "openai-codex/gpt-6-luna",
+        "thinking": "high"
+      },
+      "researcher": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "medium"
+      },
+      "worker": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "medium"
+      },
+      "delegate": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "medium"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "high"
+      },
+      "evidence-auditor": {
+        "model": "openai-codex/gpt-6-sol",
+        "thinking": "high"
+      },
+      "oracle": {
+        "model": "openai-codex/gpt-6-astra",
+        "thinking": "high"
+      }
+    }
+  },
   "packages": [
-    "/home/khoa/agent-stuff",
-    "npm:@aliou/pi-synthetic",
+    {
+      "source": "/home/khoa/agent-stuff",
+      "extensions": [
+        "-extensions/jira.ts"
+      ]
+    },
+    {
+      "source": "npm:@aliou/pi-synthetic",
+      "extensions": [
+        "+extensions/provider/index.ts",
+        "-extensions/web-search/index.ts",
+        "-extensions/command-quotas/index.ts",
+        "-extensions/sub-bar-integration/index.ts",
+        "+extensions/usage-status/index.ts",
+        "-extensions/quota-warnings/index.ts"
+      ]
+    },
     "npm:pi-simplify",
     "npm:pi-mcp-adapter",
     "npm:@eko24ive/pi-ask",
     "npm:@tmustier/pi-usage-extension",
-    "npm:pi-token-burden"
+    "npm:pi-token-burden",
+    "npm:@e9n/pi-vault",
+    "npm:pi-subagents",
+    "git:github.com/dmmulroy/pi-web-tools"
   ],
+  "pi-vault": {
+    "vaultPath": "/home/khoa/Obsidian/Khoa",
+    "vaultName": "Khoa",
+    "apiUrl": "http://127.0.0.1:27123"
+  },
   "enabledModels": [
-    "deepseek/deepseek-v4-flash",
+    "openrouter/deepseek/deepseek-v4-flash",
     "deepseek/deepseek-v4-pro",
-    "openai-codex/gpt-5.5",
     "synthetic/hf:zai-org/GLM-4.7-Flash",
-    "synthetic/hf:zai-org/GLM-5.2",
-    "synthetic/hf:MiniMaxAI/MiniMax-M3",
-    "synthetic/hf:moonshotai/Kimi-K2.7-Code",
     "openai-codex/gpt-5.6-sol",
     "openai-codex/gpt-5.6-luna",
-    "openai-codex/gpt-5.6-terra"
+    "openai-codex/gpt-5.6-terra",
+    "synthetic/hf:moonshotai/Kimi-K3",
+    "synthetic/hf:zai-org/GLM-5.3-Flash",
+    "openai-codex/gpt-6-astra",
+    "synthetic/hf:deepseek-ai/DeepSeek-V4.1-Flash",
+    "openai-codex/gpt-6-sol",
+    "openrouter/anthropic/claude-opus-5.5"
   ],
-  "theme": "nightowl"
+  "theme": "nightowl",
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "tuiMode": "fullscreen"
 }
