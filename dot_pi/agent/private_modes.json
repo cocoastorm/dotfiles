@@ -1,0 +1,27 @@
+{
+  "$schema": "./modes.schema.json",
+  "version": 1,
+  "currentMode": "precise",
+  "modes": {
+    "precise": {
+      "provider": "anthropic",
+      "modelId": "claude-opus-5-5",
+      "thinkingLevel": "medium"
+    },
+    "super-precise": {
+      "provider": "anthropic",
+      "modelId": "claude-opus-5-5",
+      "thinkingLevel": "high"
+    },
+    "sol": {
+      "provider": "openai",
+      "modelId": "gpt-6.1-sol",
+      "thinkingLevel": "medium"
+    },
+    "smol": {
+      "provider": "synthetic",
+      "modelId": "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "thinkingLevel": "high"
+    }
+  }
+}

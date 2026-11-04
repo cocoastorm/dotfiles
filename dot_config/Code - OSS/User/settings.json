@@ -190,5 +190,9 @@
     "[markdown]": {
         "editor.wordWrap": "on"
     },
-    "vsicons.dontShowNewVersionMessage": true
+    "vsicons.dontShowNewVersionMessage": true,
+    "workbench.experimental.modernUI": true,
+    "gitlens.graph.details.location": "auto",
+    "diffEditor.renderSideBySide": true,
+    "diffEditor.useInlineViewWhenSpaceIsLimited": true
 }

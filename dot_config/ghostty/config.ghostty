@@ -9,8 +9,9 @@ font-size = 12
 theme = Night Owl
 
 # ── Window ──
-window-padding-x = 4
-window-padding-y = 4
+background-blur-radius = 20
+window-padding-x = 8
+window-padding-y = 8
 window-decoration = server
 window-save-state = always
 

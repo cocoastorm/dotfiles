@@ -1,41 +1,9 @@
 {
   "enableSkillCommands": true,
-  "lastChangelogVersion": "0.99.1",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6.1-sol",
+  "lastChangelogVersion": "1.5.0",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-5-5",
   "defaultThinkingLevel": "medium",
-  "subagents": {
-    "agentOverrides": {
-      "scout": {
-        "model": "openai-codex/gpt-6-luna",
-        "thinking": "high"
-      },
-      "researcher": {
-        "model": "openai-codex/gpt-6-sol",
-        "thinking": "medium"
-      },
-      "worker": {
-        "model": "openai-codex/gpt-6-sol",
-        "thinking": "medium"
-      },
-      "delegate": {
-        "model": "openai-codex/gpt-6-sol",
-        "thinking": "medium"
-      },
-      "reviewer": {
-        "model": "openai-codex/gpt-6-sol",
-        "thinking": "high"
-      },
-      "evidence-auditor": {
-        "model": "openai-codex/gpt-6-sol",
-        "thinking": "high"
-      },
-      "oracle": {
-        "model": "openai-codex/gpt-6-astra",
-        "thinking": "high"
-      }
-    }
-  },
   "packages": [
     {
       "source": "/home/khoa/agent-stuff",
@@ -55,39 +23,37 @@
       ]
     },
     "npm:pi-simplify",
-    {
-      "source": "npm:pi-mcp-adapter",
-      "extensions": []
-    },
     "npm:@eko24ive/pi-ask",
     "npm:@tmustier/pi-usage-extension",
     "npm:pi-token-burden",
     "npm:@e9n/pi-vault",
-    "npm:pi-subagents",
-    "git:github.com/dmmulroy/pi-web-tools"
+    "git:github.com/dmmulroy/pi-web-tools",
+    "npm:pi-anthropic-oauth"
   ],
   "pi-vault": {
-    "vaultPath": "/home/khoa/Obsidian/Khoa",
+    "vaultPath": "/home/khoa/Documents/Obsidian/Khoa",
     "vaultName": "Khoa",
     "apiUrl": "http://127.0.0.1:27123"
   },
   "enabledModels": [
-    "openrouter/deepseek/deepseek-v4-flash",
-    "deepseek/deepseek-v4-pro",
-    "synthetic/hf:zai-org/GLM-4.7-Flash",
-    "openai-codex/gpt-5.6-sol",
-    "openai-codex/gpt-5.6-luna",
-    "openai-codex/gpt-5.6-terra",
     "synthetic/hf:moonshotai/Kimi-K3",
-    "synthetic/hf:zai-org/GLM-5.3-Flash",
-    "openai-codex/gpt-6-astra",
-    "synthetic/hf:deepseek-ai/DeepSeek-V4.1-Flash",
-    "openrouter/anthropic/claude-opus-5.5",
-    "openai-codex/gpt-6.1-sol"
+    "synthetic/hf:zai-org/GLM-5.3",
+    "openai/gpt-5.6-sol",
+    "openai/gpt-6.1-sol",
+    "radius/kimi-k3",
+    "synthetic/hf:deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    "anthropic/claude-opus-5-5",
+    "anthropic/claude-fable-5-1",
+    "anthropic/claude-sonnet-5-5"
   ],
   "theme": "nightowl",
-  "terminal": {
-    "showTerminalProgress": true
-  },
-  "tuiMode": "fullscreen"
+  "tuiMode": "fullscreen",
+  "deviceId": "0d369742-4729-47b7-839e-5102fb3de110",
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:@eko24ive/pi-ask\",\"scope\":\"user\"}": "1.2.0",
+    "{\"source\":\"npm:@tmustier/pi-usage-extension\",\"scope\":\"user\"}": "0.10.2",
+    "{\"source\":\"npm:pi-token-burden\",\"scope\":\"user\"}": "0.6.5",
+    "{\"source\":\"npm:@e9n/pi-vault\",\"scope\":\"user\"}": "0.1.0",
+    "{\"source\":\"npm:@aliou/pi-synthetic\",\"scope\":\"user\"}": "0.31.0"
+  }
 }

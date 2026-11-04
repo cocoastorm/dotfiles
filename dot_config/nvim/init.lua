@@ -24,7 +24,7 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
 vim.opt.termguicolors = true
 vim.opt.signcolumn = "yes"
-vim.opt.wrap = false
+vim.opt.wrap = true 
 vim.opt.scrolloff = 8
 vim.opt.mouse = "a"
 vim.opt.breakindent = true
@@ -131,7 +131,8 @@ require("lazy").setup({
 
   -- Tree-sitter parsers and native Neovim highlighting (requires Neovim 0.12+).
   {
-    "neovim-treesitter/nvim-treesitter",
+    "nvim-treesitter/nvim-treesitter",
+    branch = 'main',
     dependencies = { "neovim-treesitter/treesitter-parser-registry" },
     lazy = false,
     build = ":TSUpdate",
